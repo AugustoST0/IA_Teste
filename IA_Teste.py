@@ -64,10 +64,24 @@ class GuardiaoQualidadeIA:
         else:
             print("❌ [BUG CRÍTICO DETECTADO] O ar saturou de umidade, mas o risco calculado CAIU! A IA alucinou.")
             return False
+    
+    def testar_relacao_metamorfica_temperatura(self, umidade_fixa: float, temp_base: float) -> bool:
+        """Valida que o aumento de temperatura aumenta ou mantém estável o risco calculado."""
+        temp_elevada = temp_base + 5.0
 
-    # TO-DO [EQUIPE]: Implementar o método 'testar_relacao_metamorfica_temperatura'
-    # Vocês devem fixar uma umidade e provar que, se a temperatura aumentar em 5°C,
-    # o risco calculado obrigatoriamente deve subir ou se manter estável.
+        risco_base = modelo_bayesiano_risco_clima(temp_base, umidade_fixa)
+        risco_alto = modelo_bayesiano_risco_clima(temp_elevada, umidade_fixa)
+
+        print(f"\n[Teste Metamórfico Temperatura] Mantendo {umidade_fixa:.1f}% de umidade fixa:")
+        print(f"   * Cenário Inicial (Temp {temp_base:.1f}°C): Risco de Desastre = {risco_base:.1f}%")
+        print(f"   * Cenário Elevado (Temp {temp_elevada:.1f}°C): Risco de Desastre = {risco_alto:.1f}%")
+
+        if risco_alto >= risco_base:
+            print("✅ [SUCESSO] Propriedade Metamórfica de Temperatura Mantida.")
+            return True
+        else:
+            print("❌ [BUG CRÍTICO DETECTADO] A temperatura subiu, mas o risco calculado diminuiu!")
+            return False
 
 
 # =====================================================================
@@ -85,7 +99,6 @@ if __name__ == "__main__":
     guardiao.verificar_data_drift([42.0, 44.5, 41.2, 43.0], [15.0, 12.5, 18.0, 14.2])
     
     print("\n--- Testando Lote 3 (Sensores Instáveis / Camuflados pela Média) ---")
-    # TO-DO [EQUIPE]: Após a refatoração estatística, este lote DEVE ser barrado!
     guardiao.verificar_data_drift([10.0, 45.0, 5.0, 44.0], [70.0, 72.0, 68.0, 70.0])
     
     print("\n" + "="*60 + "\n")
@@ -98,4 +111,5 @@ if __name__ == "__main__":
     print("\n--- Cenário Metamórfico B: Iminência do Extremo ---")
     guardiao.testar_relacao_metamorfica_umidade(temp_fixa=35.0, umidade_base=75.0)
 
-    # TO-DO [EQUIPE]: Chamar aqui a nova suíte de testes de temperatura que criaram.
+    print("\n--- Cenário Metamórfico C: Nova Suite de Teste de Temperatura ---")
+    guardiao.testar_relacao_metamorfica_temperatura(umidade_fixa=88.0, temp_base=35.0)
