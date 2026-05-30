@@ -34,19 +34,21 @@ class GuardiaoQualidadeIA:
         """Avalia a consistência estocástica dos dados de produção."""
         media_temp = float(np.mean(lote_temperaturas))
         media_umi = float(np.mean(lote_umidades))
-        
-        print(f"-> Analisando Lote - Média Temp: {media_temp:.1f}°C | Média Umidade: {media_umi:.1f}%")
-        
-        # TO-DO [EQUIPE]: A validação atual por média aritmética simples é vulnerável.
-        # Se um sensor reportar falha extrema e outro compensar, a média oculta o erro.
-        # Refaturem este método para rejeitar lotes usando também o Desvio Padrão (np.std).
-        # Critério SRE: desvio de temp > 5.0°C OU umidade > 15.0% deve disparar ALERTA CRÍTICO e retornar False.
-        
+
+        desvio_temp = float(np.std(lote_temperaturas))
+        desvio_umi = float(np.std(lote_umidades))
+
+        print(f"-> Analisando Lote - Média Temp: {media_temp:.1f}°C (DP: {desvio_temp:.1f}°C) | Média Umidade: {media_umi:.1f}% (DP: {desvio_umi:.1f}%)")
+
+        if desvio_temp > 5.0 or desvio_umi > 15.0:
+            print("🚨 [ALERTA CRÍTICO] Alta volatilidade detectada nos sensores!")
+            return False
+
         if media_temp > self.limite_superior_temp or media_umi < self.limite_inferior_umidade:
             print("❌ [ALERTA DE QUALIDADE] Data Drift Detectado! Clima fora do padrão.")
             return False
-            
-        print("✅ [SUCESSO] Dados aprovados no teste de consistência por média.")
+
+        print("✅ [SUCESSO] Dados aprovados no teste de consistência.")
         return True
 
     def testar_relacao_metamorfica_umidade(self, temp_fixa: float, umidade_base: float) -> bool:
