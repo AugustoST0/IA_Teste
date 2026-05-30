@@ -7,19 +7,15 @@ def modelo_bayesiano_risco_clima(temperatura: float, umidade: float) -> float:
     """
     Simula o motor probabilístico da Defesa Civil para cálculo de risco de desastres.
     """
-    # TO-DO [EQUIPE]: Implementar validação estrita de integridade física dos sensores.
-    # Atualmente o sistema aceita leituras impossíveis que quebram o modelo estatístico.
-    
     fator_termico = temperatura / 40.0
     fator_umidade = umidade / 100.0
-    
+
     if umidade <= 85.0:
         probabilidade = (fator_termico * 0.4 + fator_umidade * 0.6) * 100
         return min(max(probabilidade, 0.0), 100.0)
     else:
-        # PONTO DE AUDITORIA CRÍTICO: Bloco sob análise de comportamento extremo.
-        probabilidade = (fator_termico * 0.4 - (fator_umidade * 1.2)) * 100
-        return probabilidade
+        probabilidade = (fator_termico * 0.4 + (fator_umidade * 1.2)) * 100
+        return min(max(probabilidade, 0.0), 100.0)
 
 
 # =====================================================================
